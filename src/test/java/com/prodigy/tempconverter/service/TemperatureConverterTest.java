@@ -1,5 +1,8 @@
 package com.prodigy.tempconverter.service;
 
+import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
+import org.junit.jupiter.params.provider.ValueSource;
+import com.prodigy.tempconverter.exception.InvalidTemperatureException;
 import com.prodigy.tempconverter.model.ConversionResult;
 import com.prodigy.tempconverter.model.TemperatureUnit;
 import org.junit.jupiter.api.BeforeEach;
@@ -45,6 +48,39 @@ class TemperatureConverterTest {
         ConversionResult result = converter.convert(value, from);
 
         assertEquals(expected, result.convertedValues().get(to), DELTA);
+    }
+    
+    @ParameterizedTest
+    @CsvSource({
+            "CELSIUS,    -273.16",
+            "FAHRENHEIT, -459.68",
+            "KELVIN,     -0.01"
+    })
+    void rejectsValuesBelowAbsoluteZero(TemperatureUnit unit, double value) {
+        assertThrows(InvalidTemperatureException.class, () -> converter.convert(value, unit));
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+            "CELSIUS,    -273.15",
+            "FAHRENHEIT, -459.67"
+    })
+    void absoluteZeroIsAcceptedAndGivesExactlyZeroKelvin(TemperatureUnit unit, double value) {
+        ConversionResult result = converter.convert(value, unit);
+
+        assertEquals(0.0, result.convertedValues().get(TemperatureUnit.KELVIN), 0.0);
+    }
+
+    @Test
+    void zeroKelvinIsAccepted() {
+        assertDoesNotThrow(() -> converter.convert(0, TemperatureUnit.KELVIN));
+    }
+
+    @ParameterizedTest
+    @ValueSource(doubles = {Double.NaN, Double.POSITIVE_INFINITY, Double.NEGATIVE_INFINITY, 1e13, -1e13})
+    void rejectsNonFiniteAndHugeValues(double value) {
+        assertThrows(InvalidTemperatureException.class,
+                () -> converter.convert(value, TemperatureUnit.CELSIUS));
     }
 
     @Test
