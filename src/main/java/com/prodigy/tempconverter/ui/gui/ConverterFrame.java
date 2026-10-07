@@ -1,5 +1,7 @@
 package com.prodigy.tempconverter.ui.gui;
 
+import com.prodigy.tempconverter.exception.InvalidTemperatureException;
+import com.prodigy.tempconverter.service.TemperatureInputParser;
 import com.prodigy.tempconverter.model.ConversionResult;
 import com.prodigy.tempconverter.model.TemperatureUnit;
 import com.prodigy.tempconverter.service.TemperatureConverter;
@@ -94,26 +96,14 @@ public class ConverterFrame extends JFrame {
 
     private void onConvert() {
         messageLabel.setText(" ");
-
-        String text = valueField.getText().trim();
-        if (text.isEmpty()) {
-            showError("Please enter a temperature value.");
-            return;
-        }
-
-        double value;
         try {
-            value = Double.parseDouble(text);
-        } catch (NumberFormatException ex) {
-            showError("Invalid number. Example: 25 or -4.5");
-            return;
+            double value = TemperatureInputParser.parse(valueField.getText());
+            TemperatureUnit unit = (TemperatureUnit) unitBox.getSelectedItem();
+            showResult(converter.convert(value, unit));
+        } catch (InvalidTemperatureException ex) {
+            showError(ex.getMessage());
         }
-
-        TemperatureUnit unit = (TemperatureUnit) unitBox.getSelectedItem();
-        ConversionResult result = converter.convert(value, unit);
-        showResult(result);
     }
-
     private void showResult(ConversionResult result) {
         StringBuilder sb = new StringBuilder();
         sb.append(formatLine("Input", result.inputValue(), result.inputUnit()));
