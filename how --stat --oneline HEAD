@@ -1,0 +1,3 @@
+[33m1f4a2e2[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature/react-dashboard[m[33m, [m[1;31morigin/feature/react-dashboard[m[33m)[m refactor: move maven project into backend/
+[33m36667ca[m[33m ([m[1;33mtag: [m[1;33mv1.0-swing[m[33m, [m[1;31morigin/main[m[33m, [m[1;32mmain[m[33m)[m test for console app.
+[33m3124c5f[m adding console mode, shared result formatter and GUI polish
